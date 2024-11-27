@@ -21,15 +21,25 @@ app.use(express.json());
 app.use('/api/v1/places', placesRoutes);
 
 // Start the server
-app.listen(port, () => {
-  console.log('Server started on port 5000');
-});
-
-// Graceful shutdown
-process.on('SIGINT', () => {
+const server = app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+  });
+  
+  // Graceful shutdown
+  process.on('SIGINT', () => {
     console.log('Received SIGINT. Closing server gracefully...');
     server.close(() => {
       console.log('Server closed. Exiting process.');
       process.exit(0);
     });
+  });
+  
+  // Error handling
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    process.exit(1);
+  });
+  
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   });
